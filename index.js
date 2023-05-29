@@ -7,7 +7,7 @@ const dev = require('./config');
 
 
 const connectToMongoDB = require('./config/db');
-const userRouter = require('./routes');
+const userRouter = require('./routes/users');
 
 const app = express();
 

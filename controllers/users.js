@@ -1,3 +1,9 @@
+const jwt = require('jsonwebtoken');
+const dev = require('../config')
+
+const { securePassword } = require("../helpers/bcryptPassword");
+const User = require('../models/users');
+
 const registerUser = async (req, res) => {
     try {
         const { name, email, phone, password } = req.fields;
@@ -14,7 +20,7 @@ const registerUser = async (req, res) => {
                 message: 'minimum length for password is 6'
             })
         }
-        if (image && image.size > 1000000) {
+        if (image && image.size > 10000000) {
             return res.status(404).json({
                 message: 'maximum size for image is 1Mb'
             })
@@ -26,10 +32,25 @@ const registerUser = async (req, res) => {
                 message: 'user with email already exists'
             })
         }
-        res.status(200).json({message: 'user is created'})
+
+        const hashedPassword = await securePassword(password);
+        //store the data
+        const token = jwt.sign(
+                {name, email, phone, hashedPassword, image}, 
+                dev.app.jwtSecretKey
+            );
+            console.log(token);
+            
+
+            res.status(200).json({
+                token: token,
+            });
+
+
+        //res.status(200).json({message: 'user is created'})
     } catch (error) {
         res.status(500).json({
-            message: message.error
+            message: error.message
         })
     }
 }
